@@ -1,26 +1,25 @@
 grammar PAD;
 
-formula    : quants qf_expr ;
+formula    : quants qfexpr ;
 
-quants     : ( 'E' | 'A' ) VARIABLE quants
-           | ( 'E' | 'A' ) VARIABLE ':'
+quants     : quant=('E' | 'A') VARIABLE quants  # RecQuant
+           | quant=('E' | 'A') VARIABLE ':'     # Quant
 	   ;
 
-qf_expr    : qf_expr ( '||' | '&&' ) qf_expr
-           | '~'? '(' qf_expr ')'
-	   | '~'? predicate
+qfexpr     : qfexpr '&&' qfexpr       # AndQFExpr
+           | qfexpr '||' qfexpr       # OrQFExpr
+           | neg='~'? '(' qfexpr ')'  # UnaQFExpr
+	   | neg='~'? predicate       # UnaPred
 	   ;
 
-predicate  : polynomial ( '=' | '!=' ) polynomial
-           | polynomial ( '<' | '<=' ) polynomial
-	   | polynomial ( '>' | '>=' ) polynomial
-	   | polynomial '%' polynomial
+predicate  : polynomial pred=('=' | '!=' | '<' | '<=' | '>' | '>=' | '|') polynomial  # Pred
 	   ;
 
-polynomial : polynomial '*' polynomial
-           | polynomial ( '+' | '-' ) polynomial
-           | '-'? '(' polynomial ')'
-           | '-'? atom 
+polynomial : polynomial '*' polynomial    # MultPoly
+           | polynomial '+' polynomial    # SumPoly
+           | polynomial '-' polynomial    # SubPoly
+           | neg='-'? '(' polynomial ')'  # UnaPoly
+           | neg='-'? atom                # UnaAtom
            ;
 
 atom : INT | VARIABLE;

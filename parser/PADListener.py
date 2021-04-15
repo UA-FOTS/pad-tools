@@ -17,39 +17,93 @@ class PADListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PADParser#quants.
-    def enterQuants(self, ctx:PADParser.QuantsContext):
+    # Enter a parse tree produced by PADParser#RecQuant.
+    def enterRecQuant(self, ctx:PADParser.RecQuantContext):
         pass
 
-    # Exit a parse tree produced by PADParser#quants.
-    def exitQuants(self, ctx:PADParser.QuantsContext):
-        pass
-
-
-    # Enter a parse tree produced by PADParser#qf_expr.
-    def enterQf_expr(self, ctx:PADParser.Qf_exprContext):
-        pass
-
-    # Exit a parse tree produced by PADParser#qf_expr.
-    def exitQf_expr(self, ctx:PADParser.Qf_exprContext):
+    # Exit a parse tree produced by PADParser#RecQuant.
+    def exitRecQuant(self, ctx:PADParser.RecQuantContext):
         pass
 
 
-    # Enter a parse tree produced by PADParser#predicate.
-    def enterPredicate(self, ctx:PADParser.PredicateContext):
+    # Enter a parse tree produced by PADParser#Quant.
+    def enterQuant(self, ctx:PADParser.QuantContext):
         pass
 
-    # Exit a parse tree produced by PADParser#predicate.
-    def exitPredicate(self, ctx:PADParser.PredicateContext):
+    # Exit a parse tree produced by PADParser#Quant.
+    def exitQuant(self, ctx:PADParser.QuantContext):
         pass
 
 
-    # Enter a parse tree produced by PADParser#polynomial.
-    def enterPolynomial(self, ctx:PADParser.PolynomialContext):
+    # Enter a parse tree produced by PADParser#BinQFExpr.
+    def enterBinQFExpr(self, ctx:PADParser.BinQFExprContext):
         pass
 
-    # Exit a parse tree produced by PADParser#polynomial.
-    def exitPolynomial(self, ctx:PADParser.PolynomialContext):
+    # Exit a parse tree produced by PADParser#BinQFExpr.
+    def exitBinQFExpr(self, ctx:PADParser.BinQFExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#UnaQFExpr.
+    def enterUnaQFExpr(self, ctx:PADParser.UnaQFExprContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#UnaQFExpr.
+    def exitUnaQFExpr(self, ctx:PADParser.UnaQFExprContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#UnaPred.
+    def enterUnaPred(self, ctx:PADParser.UnaPredContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#UnaPred.
+    def exitUnaPred(self, ctx:PADParser.UnaPredContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#Pred.
+    def enterPred(self, ctx:PADParser.PredContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#Pred.
+    def exitPred(self, ctx:PADParser.PredContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#UnaAtom.
+    def enterUnaAtom(self, ctx:PADParser.UnaAtomContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#UnaAtom.
+    def exitUnaAtom(self, ctx:PADParser.UnaAtomContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#SumPoly.
+    def enterSumPoly(self, ctx:PADParser.SumPolyContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#SumPoly.
+    def exitSumPoly(self, ctx:PADParser.SumPolyContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#UnaPoly.
+    def enterUnaPoly(self, ctx:PADParser.UnaPolyContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#UnaPoly.
+    def exitUnaPoly(self, ctx:PADParser.UnaPolyContext):
+        pass
+
+
+    # Enter a parse tree produced by PADParser#MultPoly.
+    def enterMultPoly(self, ctx:PADParser.MultPolyContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#MultPoly.
+    def exitMultPoly(self, ctx:PADParser.MultPolyContext):
         pass
 
 
