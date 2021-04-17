@@ -1,4 +1,4 @@
-# pad-tools
+# PAD Tools
 Library to manipulate Presburger arithmetic formulas with divisibility
 
 ![Tests badge](https://github.com/UA-FOTS/pad-tools/actions/workflows/main.yml/badge.svg)
