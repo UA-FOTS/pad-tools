@@ -45,6 +45,22 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(str(formula.getExpression()),
                          "(x1 = 1) || ((~(y3 != 0)) && (x2 < -3))")
 
+    def testExpression2(self):
+        formula = parseFromString(
+            "E x1 A y3 : x1=1 || ~(y3!=0) && 10* x1+ -5 * x2<-3")
+        self.assertEqual(str(formula.getExpression()),
+                         "(x1 = 1) || " +
+                         "((~(y3 != 0)) && (10*x1 + -5*x2 < -3))")
+
+    def testExpression3(self):
+        formula = parseFromString(
+            "E x1 A y3 : x1=1 || ~(y3!=0) && 10* x1+ -5 * x2<-3" +
+            "|| (1 + 4) * x1 = 32")
+        self.assertEqual(str(formula.getExpression()),
+                         "((x1 = 1) || " +
+                         "((~(y3 != 0)) && (10*x1 + -5*x2 < -3))) || " +
+                         "(5*x1 = 32)")
+
 
 if __name__ == '__main__':
     unittest.main()
