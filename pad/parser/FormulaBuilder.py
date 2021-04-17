@@ -18,11 +18,18 @@ along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 """
 
 from ..formula.Expression import Predicate
+from ..formula.Formula import Formula
 from ..formula.LinearPolynomial import LinearPolynomial
 from .PADListener import PADListener
 
 
 class FormulaBuilder(PADListener):
+    def __init__(self):
+        self.formula = Formula()
+
+    def getFormula(self):
+        return self.formula
+
     def exitUnaInt(self, ctx):
         coefficient = int(ctx.INT().getText())
         if ctx.neg is not None:
@@ -60,4 +67,22 @@ class FormulaBuilder(PADListener):
         ctx.expr = Predicate(predType[ctx.BINOP().getText()],
                              ctx.polynomial(0).poly,
                              ctx.polynomial(1).poly)
-        print(str(ctx.expr))
+
+    def exitAndQFExpr(self, ctx):
+        ctx.expr = ctx.qfexpr(0).expr & ctx.qfexpr(1).expr
+
+    def exitOrQFExpr(self, ctx):
+        ctx.expr = ctx.qfexpr(0).expr | ctx.qfexpr(1).expr
+
+    def exitUnaQFExpr(self, ctx):
+        ctx.expr = ctx.qfexpr().expr
+        if ctx.neg is not None:
+            ctx.expr = ~ctx.qfexpr().expr
+
+    def exitUnaPred(self, ctx):
+        ctx.expr = ctx.predicate().expr
+        if ctx.neg is not None:
+            ctx.expr = ~ctx.predicate().expr
+
+    def exitFormula(self, ctx):
+        self.formula.setExpression(ctx.qfexpr().expr)
