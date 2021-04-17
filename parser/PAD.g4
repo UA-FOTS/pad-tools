@@ -19,10 +19,9 @@ polynomial : polynomial '*' polynomial    # MultPoly
            | polynomial '+' polynomial    # SumPoly
            | polynomial '-' polynomial    # SubPoly
            | neg='-'? '(' polynomial ')'  # UnaPoly
-           | neg='-'? atom                # UnaAtom
+           | neg='-'? INT                 # UnaInt
+           | neg='-'? VARIABLE            # UnaVar
            ;
-
-atom : INT | VARIABLE;
 
 VARIABLE : LETTER ( LETTER | DIGIT )*;
 INT      : DIGIT+;

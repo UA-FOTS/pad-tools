@@ -35,12 +35,12 @@ class PADListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PADParser#BinQFExpr.
-    def enterBinQFExpr(self, ctx:PADParser.BinQFExprContext):
+    # Enter a parse tree produced by PADParser#AndQFExpr.
+    def enterAndQFExpr(self, ctx:PADParser.AndQFExprContext):
         pass
 
-    # Exit a parse tree produced by PADParser#BinQFExpr.
-    def exitBinQFExpr(self, ctx:PADParser.BinQFExprContext):
+    # Exit a parse tree produced by PADParser#AndQFExpr.
+    def exitAndQFExpr(self, ctx:PADParser.AndQFExprContext):
         pass
 
 
@@ -62,6 +62,15 @@ class PADListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PADParser#OrQFExpr.
+    def enterOrQFExpr(self, ctx:PADParser.OrQFExprContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#OrQFExpr.
+    def exitOrQFExpr(self, ctx:PADParser.OrQFExprContext):
+        pass
+
+
     # Enter a parse tree produced by PADParser#Pred.
     def enterPred(self, ctx:PADParser.PredContext):
         pass
@@ -71,12 +80,12 @@ class PADListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PADParser#UnaAtom.
-    def enterUnaAtom(self, ctx:PADParser.UnaAtomContext):
+    # Enter a parse tree produced by PADParser#UnaInt.
+    def enterUnaInt(self, ctx:PADParser.UnaIntContext):
         pass
 
-    # Exit a parse tree produced by PADParser#UnaAtom.
-    def exitUnaAtom(self, ctx:PADParser.UnaAtomContext):
+    # Exit a parse tree produced by PADParser#UnaInt.
+    def exitUnaInt(self, ctx:PADParser.UnaIntContext):
         pass
 
 
@@ -98,6 +107,15 @@ class PADListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by PADParser#UnaVar.
+    def enterUnaVar(self, ctx:PADParser.UnaVarContext):
+        pass
+
+    # Exit a parse tree produced by PADParser#UnaVar.
+    def exitUnaVar(self, ctx:PADParser.UnaVarContext):
+        pass
+
+
     # Enter a parse tree produced by PADParser#MultPoly.
     def enterMultPoly(self, ctx:PADParser.MultPolyContext):
         pass
@@ -107,12 +125,12 @@ class PADListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by PADParser#atom.
-    def enterAtom(self, ctx:PADParser.AtomContext):
+    # Enter a parse tree produced by PADParser#SubPoly.
+    def enterSubPoly(self, ctx:PADParser.SubPolyContext):
         pass
 
-    # Exit a parse tree produced by PADParser#atom.
-    def exitAtom(self, ctx:PADParser.AtomContext):
+    # Exit a parse tree produced by PADParser#SubPoly.
+    def exitSubPoly(self, ctx:PADParser.SubPolyContext):
         pass
 
 
