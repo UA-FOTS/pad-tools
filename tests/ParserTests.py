@@ -61,6 +61,27 @@ class ParserTests(unittest.TestCase):
                          "((~(y3 != 0)) && (10*x1 + -5*x2 < -3))) || " +
                          "(5*x1 = 32)")
 
+    def testFormula1(self):
+        formula = parseFromString("E x1 A y3 : x1=1 || ~(y3!=0) && x2<-3")
+        self.assertEqual(str(formula), "E x1 A y3: " +
+                         "(x1 = 1) || ((~(y3 != 0)) && (x2 < -3))")
+
+    def testFormula2(self):
+        formula = parseFromString(
+            "E x1 E x2 : x1=1 || ~(y3!=0) && 10* x1+ -5 * x2<-3")
+        self.assertEqual(str(formula), "E x1 E x2: " +
+                         "(x1 = 1) || " +
+                         "((~(y3 != 0)) && (10*x1 + -5*x2 < -3))")
+
+    def testFormula3(self):
+        formula = parseFromString(
+            "E x1 A x2 A y3 : x1=1 || ~(y3!=0) && 10* x1+ -5 * x2<-3" +
+            "|| (1 + 4) * x1 = 32")
+        self.assertEqual(str(formula), "E x1 A x2 A y3: " +
+                         "((x1 = 1) || " +
+                         "((~(y3 != 0)) && (10*x1 + -5*x2 < -3))) || " +
+                         "(5*x1 = 32)")
+
 
 if __name__ == '__main__':
     unittest.main()
