@@ -16,6 +16,7 @@ def main(fname):
     builder = FormulaBuilder()
     walker = ParseTreeWalker()
     walker.walk(builder, tree)
+    print(str(builder.getFormula()))
 
 
 if __name__ == '__main__':

@@ -86,3 +86,15 @@ class FormulaBuilder(PADListener):
 
     def exitFormula(self, ctx):
         self.formula.setExpression(ctx.qfexpr().expr)
+
+    def addQuant(self, ctx):
+        quantType = {"A": Formula.QuantType.UNIV,
+                     "E": Formula.QuantType.EXIST}
+        self.formula.addQuant(quantType[ctx.QUANT().getText()],
+                              ctx.VARIABLE().getText())
+
+    def enterQuant(self, ctx):
+        self.addQuant(ctx)
+
+    def enterRecQuant(self, ctx):
+        self.addQuant(ctx)

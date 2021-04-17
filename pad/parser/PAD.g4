@@ -20,8 +20,8 @@ grammar PAD;
 
 formula    : quants qfexpr ;
 
-quants     : quant=('E' | 'A') VARIABLE quants  # RecQuant
-           | quant=('E' | 'A') VARIABLE ':'     # Quant
+quants     : QUANT VARIABLE quants  # RecQuant
+           | QUANT VARIABLE ':'     # Quant
 	   ;
 
 qfexpr     : qfexpr '&&' qfexpr       # AndQFExpr
@@ -41,6 +41,7 @@ polynomial : polynomial '*' polynomial    # MultPoly
            | neg='-'? VARIABLE            # UnaVar
            ;
 
+QUANT    : 'A' | 'E';
 BINOP    : '=' | '!=' | '<' | '<=' | '>' | '>=' | '%';
 VARIABLE : LETTER ( LETTER | DIGIT )*;
 INT      : DIGIT+;
