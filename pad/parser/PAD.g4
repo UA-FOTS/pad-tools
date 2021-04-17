@@ -30,7 +30,7 @@ qfexpr     : qfexpr '&&' qfexpr       # AndQFExpr
 	   | neg='~'? predicate       # UnaPred
 	   ;
 
-predicate  : polynomial pred=('=' | '!=' | '<' | '<=' | '>' | '>=' | '|') polynomial  # Pred
+predicate  : polynomial BINOP polynomial  # Pred
 	   ;
 
 polynomial : polynomial '*' polynomial    # MultPoly
@@ -41,6 +41,7 @@ polynomial : polynomial '*' polynomial    # MultPoly
            | neg='-'? VARIABLE            # UnaVar
            ;
 
+BINOP    : '=' | '!=' | '<' | '<=' | '>' | '>=' | '%';
 VARIABLE : LETTER ( LETTER | DIGIT )*;
 INT      : DIGIT+;
 WS       : [ \t\r\n]+ -> skip;

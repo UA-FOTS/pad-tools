@@ -61,7 +61,19 @@ class LinearPolynomial:
             raise Exception("Found a nonlinear polynomial!")
 
     def __str__(self):
-        return self.poly.__str__()
+        def coeffStr(c):
+            if c == 1:
+                return ""
+            elif c == -1:
+                return "-"
+            else:
+                return str(c) + "*"
+        monomials = [coeffStr(v) + k
+                     for k, v in self.poly.items()
+                     if k != ""]
+        if "" in self.poly:
+            monomials.append(str(self.poly[""]))
+        return " + ".join(monomials)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.poly == other.poly

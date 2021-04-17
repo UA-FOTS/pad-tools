@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 """
 
+from ..formula.Expression import Predicate
 from ..formula.LinearPolynomial import LinearPolynomial
 from .PADListener import PADListener
 
@@ -27,29 +28,36 @@ class FormulaBuilder(PADListener):
         if ctx.neg is not None:
             coefficient *= -1
         ctx.poly = LinearPolynomial({"": coefficient})
-        print(ctx.poly)
 
     def exitUnaVar(self, ctx):
         coefficient = 1
         if ctx.neg is not None:
             coefficient *= -1
         ctx.poly = LinearPolynomial({ctx.VARIABLE().getText(): coefficient})
-        print("unavar " + str(ctx.poly))
 
     def exitUnaPoly(self, ctx):
         ctx.poly = ctx.polynomial().poly
         if ctx.neg is not None:
             ctx.poly.negate()
-        print("unapoly " + str(ctx.poly))
 
     def exitSumPoly(self, ctx):
         ctx.poly = ctx.polynomial(0).poly + ctx.polynomial(1).poly
-        print("sum " + str(ctx.poly))
 
     def exitSubPoly(self, ctx):
         ctx.poly = ctx.polynomial(0).poly - ctx.polynomial(1).poly
-        print(ctx.poly)
 
     def exitMultPoly(self, ctx):
         ctx.poly = ctx.polynomial(0).poly * ctx.polynomial(1).poly
-        print("prod " + str(ctx.poly))
+
+    def exitPred(self, ctx):
+        predType = {"=": Predicate.Type.EQ,
+                    "!=": Predicate.Type.NEQ,
+                    "<": Predicate.Type.LE,
+                    "<=": Predicate.Type.LEQ,
+                    ">": Predicate.Type.GE,
+                    ">=": Predicate.Type.GEQ,
+                    "%": Predicate.Type.DIV}
+        ctx.expr = Predicate(predType[ctx.BINOP().getText()],
+                             ctx.polynomial(0).poly,
+                             ctx.polynomial(1).poly)
+        print(str(ctx.expr))

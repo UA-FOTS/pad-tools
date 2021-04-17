@@ -11,7 +11,7 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\27")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\21")
         buf.write("U\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\3\2\3\2\3\2")
         buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\5\3\26\n\3\3\4\3\4\5\4\32\n\4")
         buf.write("\3\4\3\4\3\4\3\4\3\4\5\4!\n\4\3\4\5\4$\n\4\3\4\3\4\3\4")
@@ -19,27 +19,27 @@ def serializedATN():
         buf.write("\6\3\6\5\6\67\n\6\3\6\3\6\3\6\3\6\3\6\5\6>\n\6\3\6\3\6")
         buf.write("\5\6B\n\6\3\6\5\6E\n\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6")
         buf.write("\3\6\7\6P\n\6\f\6\16\6S\13\6\3\6\2\4\6\n\7\2\4\6\b\n\2")
-        buf.write("\4\3\2\3\4\3\2\13\21\2]\2\f\3\2\2\2\4\25\3\2\2\2\6#\3")
-        buf.write("\2\2\2\b\60\3\2\2\2\nD\3\2\2\2\f\r\5\4\3\2\r\16\5\6\4")
-        buf.write("\2\16\3\3\2\2\2\17\20\t\2\2\2\20\21\7\25\2\2\21\26\5\4")
-        buf.write("\3\2\22\23\t\2\2\2\23\24\7\25\2\2\24\26\7\5\2\2\25\17")
-        buf.write("\3\2\2\2\25\22\3\2\2\2\26\5\3\2\2\2\27\31\b\4\1\2\30\32")
-        buf.write("\7\b\2\2\31\30\3\2\2\2\31\32\3\2\2\2\32\33\3\2\2\2\33")
-        buf.write("\34\7\t\2\2\34\35\5\6\4\2\35\36\7\n\2\2\36$\3\2\2\2\37")
-        buf.write("!\7\b\2\2 \37\3\2\2\2 !\3\2\2\2!\"\3\2\2\2\"$\5\b\5\2")
-        buf.write("#\27\3\2\2\2# \3\2\2\2$-\3\2\2\2%&\f\6\2\2&\'\7\6\2\2")
-        buf.write("\',\5\6\4\7()\f\5\2\2)*\7\7\2\2*,\5\6\4\6+%\3\2\2\2+(")
-        buf.write("\3\2\2\2,/\3\2\2\2-+\3\2\2\2-.\3\2\2\2.\7\3\2\2\2/-\3")
-        buf.write("\2\2\2\60\61\5\n\6\2\61\62\t\3\2\2\62\63\5\n\6\2\63\t")
-        buf.write("\3\2\2\2\64\66\b\6\1\2\65\67\7\24\2\2\66\65\3\2\2\2\66")
-        buf.write("\67\3\2\2\2\678\3\2\2\289\7\t\2\29:\5\n\6\2:;\7\n\2\2")
-        buf.write(";E\3\2\2\2<>\7\24\2\2=<\3\2\2\2=>\3\2\2\2>?\3\2\2\2?E")
-        buf.write("\7\26\2\2@B\7\24\2\2A@\3\2\2\2AB\3\2\2\2BC\3\2\2\2CE\7")
-        buf.write("\25\2\2D\64\3\2\2\2D=\3\2\2\2DA\3\2\2\2EQ\3\2\2\2FG\f")
-        buf.write("\b\2\2GH\7\22\2\2HP\5\n\6\tIJ\f\7\2\2JK\7\23\2\2KP\5\n")
-        buf.write("\6\bLM\f\6\2\2MN\7\24\2\2NP\5\n\6\7OF\3\2\2\2OI\3\2\2")
-        buf.write("\2OL\3\2\2\2PS\3\2\2\2QO\3\2\2\2QR\3\2\2\2R\13\3\2\2\2")
-        buf.write("SQ\3\2\2\2\16\25\31 #+-\66=ADOQ")
+        buf.write("\3\3\2\3\4\2]\2\f\3\2\2\2\4\25\3\2\2\2\6#\3\2\2\2\b\60")
+        buf.write("\3\2\2\2\nD\3\2\2\2\f\r\5\4\3\2\r\16\5\6\4\2\16\3\3\2")
+        buf.write("\2\2\17\20\t\2\2\2\20\21\7\17\2\2\21\26\5\4\3\2\22\23")
+        buf.write("\t\2\2\2\23\24\7\17\2\2\24\26\7\5\2\2\25\17\3\2\2\2\25")
+        buf.write("\22\3\2\2\2\26\5\3\2\2\2\27\31\b\4\1\2\30\32\7\b\2\2\31")
+        buf.write("\30\3\2\2\2\31\32\3\2\2\2\32\33\3\2\2\2\33\34\7\t\2\2")
+        buf.write("\34\35\5\6\4\2\35\36\7\n\2\2\36$\3\2\2\2\37!\7\b\2\2 ")
+        buf.write("\37\3\2\2\2 !\3\2\2\2!\"\3\2\2\2\"$\5\b\5\2#\27\3\2\2")
+        buf.write("\2# \3\2\2\2$-\3\2\2\2%&\f\6\2\2&\'\7\6\2\2\',\5\6\4\7")
+        buf.write("()\f\5\2\2)*\7\7\2\2*,\5\6\4\6+%\3\2\2\2+(\3\2\2\2,/\3")
+        buf.write("\2\2\2-+\3\2\2\2-.\3\2\2\2.\7\3\2\2\2/-\3\2\2\2\60\61")
+        buf.write("\5\n\6\2\61\62\7\16\2\2\62\63\5\n\6\2\63\t\3\2\2\2\64")
+        buf.write("\66\b\6\1\2\65\67\7\r\2\2\66\65\3\2\2\2\66\67\3\2\2\2")
+        buf.write("\678\3\2\2\289\7\t\2\29:\5\n\6\2:;\7\n\2\2;E\3\2\2\2<")
+        buf.write(">\7\r\2\2=<\3\2\2\2=>\3\2\2\2>?\3\2\2\2?E\7\20\2\2@B\7")
+        buf.write("\r\2\2A@\3\2\2\2AB\3\2\2\2BC\3\2\2\2CE\7\17\2\2D\64\3")
+        buf.write("\2\2\2D=\3\2\2\2DA\3\2\2\2EQ\3\2\2\2FG\f\b\2\2GH\7\13")
+        buf.write("\2\2HP\5\n\6\tIJ\f\7\2\2JK\7\f\2\2KP\5\n\6\bLM\f\6\2\2")
+        buf.write("MN\7\r\2\2NP\5\n\6\7OF\3\2\2\2OI\3\2\2\2OL\3\2\2\2PS\3")
+        buf.write("\2\2\2QO\3\2\2\2QR\3\2\2\2R\13\3\2\2\2SQ\3\2\2\2\16\25")
+        buf.write("\31 #+-\66=ADOQ")
         return buf.getvalue()
 
 
@@ -54,15 +54,12 @@ class PADParser ( Parser ):
     sharedContextCache = PredictionContextCache()
 
     literalNames = [ "<INVALID>", "'E'", "'A'", "':'", "'&&'", "'||'", "'~'", 
-                     "'('", "')'", "'='", "'!='", "'<'", "'<='", "'>'", 
-                     "'>='", "'|'", "'*'", "'+'", "'-'" ]
+                     "'('", "')'", "'*'", "'+'", "'-'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "<INVALID>", "VARIABLE", 
-                      "INT", "WS" ]
+                      "BINOP", "VARIABLE", "INT", "WS" ]
 
     RULE_formula = 0
     RULE_quants = 1
@@ -84,16 +81,10 @@ class PADParser ( Parser ):
     T__8=9
     T__9=10
     T__10=11
-    T__11=12
-    T__12=13
-    T__13=14
-    T__14=15
-    T__15=16
-    T__16=17
-    T__17=18
-    VARIABLE=19
-    INT=20
-    WS=21
+    BINOP=12
+    VARIABLE=13
+    INT=14
+    WS=15
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -489,7 +480,6 @@ class PADParser ( Parser ):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a PADParser.PredicateContext
             super().__init__(parser)
-            self.pred = None # Token
             self.copyFrom(ctx)
 
         def polynomial(self, i:int=None):
@@ -498,6 +488,8 @@ class PADParser ( Parser ):
             else:
                 return self.getTypedRuleContext(PADParser.PolynomialContext,i)
 
+        def BINOP(self):
+            return self.getToken(PADParser.BINOP, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterPred" ):
@@ -513,20 +505,13 @@ class PADParser ( Parser ):
 
         localctx = PADParser.PredicateContext(self, self._ctx, self.state)
         self.enterRule(localctx, 6, self.RULE_predicate)
-        self._la = 0 # Token type
         try:
             localctx = PADParser.PredContext(self, localctx)
             self.enterOuterAlt(localctx, 1)
             self.state = 46
             self.polynomial(0)
             self.state = 47
-            localctx.pred = self._input.LT(1)
-            _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << PADParser.T__8) | (1 << PADParser.T__9) | (1 << PADParser.T__10) | (1 << PADParser.T__11) | (1 << PADParser.T__12) | (1 << PADParser.T__13) | (1 << PADParser.T__14))) != 0)):
-                localctx.pred = self._errHandler.recoverInline(self)
-            else:
-                self._errHandler.reportMatch(self)
-                self.consume()
+            self.match(PADParser.BINOP)
             self.state = 48
             self.polynomial(0)
         except RecognitionException as re:
@@ -700,9 +685,9 @@ class PADParser ( Parser ):
                 self.state = 52
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if _la==PADParser.T__17:
+                if _la==PADParser.T__10:
                     self.state = 51
-                    localctx.neg = self.match(PADParser.T__17)
+                    localctx.neg = self.match(PADParser.T__10)
 
 
                 self.state = 54
@@ -720,9 +705,9 @@ class PADParser ( Parser ):
                 self.state = 59
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if _la==PADParser.T__17:
+                if _la==PADParser.T__10:
                     self.state = 58
-                    localctx.neg = self.match(PADParser.T__17)
+                    localctx.neg = self.match(PADParser.T__10)
 
 
                 self.state = 61
@@ -736,9 +721,9 @@ class PADParser ( Parser ):
                 self.state = 63
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if _la==PADParser.T__17:
+                if _la==PADParser.T__10:
                     self.state = 62
-                    localctx.neg = self.match(PADParser.T__17)
+                    localctx.neg = self.match(PADParser.T__10)
 
 
                 self.state = 65
@@ -766,7 +751,7 @@ class PADParser ( Parser ):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
                         self.state = 69
-                        self.match(PADParser.T__15)
+                        self.match(PADParser.T__8)
                         self.state = 70
                         self.polynomial(7)
                         pass
@@ -779,7 +764,7 @@ class PADParser ( Parser ):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
                         self.state = 72
-                        self.match(PADParser.T__16)
+                        self.match(PADParser.T__9)
                         self.state = 73
                         self.polynomial(6)
                         pass
@@ -792,7 +777,7 @@ class PADParser ( Parser ):
                             from antlr4.error.Errors import FailedPredicateException
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
                         self.state = 75
-                        self.match(PADParser.T__17)
+                        self.match(PADParser.T__10)
                         self.state = 76
                         self.polynomial(5)
                         pass
