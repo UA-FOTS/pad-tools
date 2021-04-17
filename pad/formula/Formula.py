@@ -38,7 +38,7 @@ class Formula:
 
     def addQuant(self, t, var):
         if var in self.quantd:
-            raise Exception(f"Quantified {var} more than once!")
+            raise Exception("Quantified " + var + " more than once!")
         self.quants.append((t, var))
         self.quantd.add(var)
 
