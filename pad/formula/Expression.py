@@ -53,6 +53,19 @@ class Expression:
                 Expression.typeStr[self.t] +\
                 " (" + self.right.__str__() + ")"
 
+    def NNF(self, neg=False):
+        if self.t == Expression.Type.NOT:
+            return self.left.NNF(not neg)
+        else:
+            newT = self.t
+            if neg and self.t == Expression.Type.AND:
+                newT = Expression.Type.OR
+            elif neg and self.t == Expression.Type.OR:
+                newT = Expression.Type.AND
+            newLeft = self.left.NNF(neg)
+            newRight = self.right.NNF(neg)
+            return Expression(newT, newLeft, newRight)
+
     def dotLabel(self):
         return "[label=" + "\"" + Expression.typeStr[self.t] + "\"]"
 
@@ -125,6 +138,24 @@ class Predicate(Expression):
     def __str__(self):
         return self.left.__str__() + " " + Predicate.typeStr[self.t] +\
             " " + self.right.__str__()
+
+    def NNF(self, neg=False):
+        if not neg:
+            return self
+        elif self.t == Predicate.Type.EQ:
+            return Predicate(Predicate.Type.NEQ, self.left, self.right)
+        elif self.t == Predicate.Type.NEQ:
+            return Predicate(Predicate.Type.EQ, self.left, self.right)
+        elif self.t == Predicate.Type.LE:
+            return Predicate(Predicate.Type.GEQ, self.left, self.right)
+        elif self.t == Predicate.Type.LEQ:
+            return Predicate(Predicate.Type.GE, self.left, self.right)
+        elif self.t == Predicate.Type.GE:
+            return Predicate(Predicate.Type.LEQ, self.left, self.right)
+        elif self.t == Predicate.Type.GEQ:
+            return Predicate(Predicate.Type.LE, self.left, self.right)
+        elif self.t == Predicate.Type.DIV:
+            return self.invert()
 
     def eval(self, val):
         leftPoly = self.left.eval(val)

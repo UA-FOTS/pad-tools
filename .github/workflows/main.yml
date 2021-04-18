@@ -31,4 +31,5 @@ jobs:
       run: |
         export PYTHONPATH=$(pwd)
         python tests/ParserTests.py
+        python tests/TransformTests.py
 
