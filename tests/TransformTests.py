@@ -56,6 +56,24 @@ class TransformTests(unittest.TestCase):
         self.assertEqual(str(nnfExp),
                          "((x1 <= 10) && (y + 32 != 5)) && (x2 > x1)")
 
+    def testDNF1(self):
+        formula = parseFromString("x1 > 10 && ~(x2 <= x1)")
+        dnfExp = formula.getExpression().DNF()
+        self.assertEqual(str(dnfExp), "(x1 > 10) && (x2 > x1)")
+
+    def testDNF2(self):
+        formula = parseFromString("x1 > 10 && (x2 <= x1 || x1 != y3)")
+        dnfExp = formula.getExpression().DNF()
+        self.assertEqual(str(dnfExp),
+                         "((x1 > 10) && (x2 <= x1)) || "
+                         "((x1 > 10) && (x1 != y3))")
+
+    def testDNF3(self):
+        formula = parseFromString("x1 > 10 && x2 <= x1 || y1 != x1")
+        dnfExp = formula.getExpression().DNF()
+        self.assertEqual(str(dnfExp),
+                         "((x1 > 10) && (x2 <= x1)) || (y1 != x1)")
+
 
 if __name__ == '__main__':
     unittest.main()

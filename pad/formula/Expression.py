@@ -53,6 +53,39 @@ class Expression:
                 Expression.typeStr[self.t] +\
                 " (" + self.right.__str__() + ")"
 
+    def DNF(self):
+        nnfExp = self.NNF()
+
+        def _recDNF(node):
+            if node.t not in [Expression.Type.AND,
+                              Expression.Type.OR]:
+                return node
+            else:
+                newLeft = node.left.DNF()
+                newRight = node.right.DNF()
+                if node.t == Expression.Type.AND:
+                    canDistribute = False
+                    if newLeft.t == Expression.Type.OR:
+                        conjunct = newRight
+                        disj1 = newLeft.left
+                        disj2 = newLeft.right
+                        canDistribute = True
+                    elif newRight.t == Expression.Type.OR:
+                        conjunct = newLeft
+                        disj1 = newRight.left
+                        disj2 = newRight.right
+                        canDistribute = True
+                    if canDistribute:
+                        conj1 = Expression(Expression.Type.AND,
+                                           conjunct, disj1)
+                        conj2 = Expression(Expression.Type.AND,
+                                           conjunct, disj2)
+                        return Expression(Expression.Type.OR,
+                                          conj1, conj2)
+                return node
+
+        return _recDNF(nnfExp)
+
     def NNF(self, neg=False):
         if self.t == Expression.Type.NOT:
             return self.left.NNF(not neg)
@@ -114,13 +147,13 @@ class Expression:
 
 class Predicate(Expression):
     class Type(Enum):
-        EQ = 1
-        NEQ = 2
-        LE = 3
-        LEQ = 4
-        GE = 5
-        GEQ = 6
-        DIV = 7
+        EQ = 4
+        NEQ = 5
+        LE = 6
+        LEQ = 7
+        GE = 8
+        GEQ = 9
+        DIV = 10
 
     def __init__(self, t, left, right):
         self.t = t
