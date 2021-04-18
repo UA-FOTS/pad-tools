@@ -19,23 +19,11 @@ along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 
 import unittest
 
-from antlr4 import CommonTokenStream, InputStream, ParseTreeWalker
-from pad.parser.PADLexer import PADLexer
-from pad.parser.FormulaBuilder import FormulaBuilder
-from pad.parser.PADParser import PADParser
+from pad.formula.Formula import Formula
 
 
 def parseFromString(s):
-    lexer = PADLexer(InputStream(s))
-    stream = CommonTokenStream(lexer)
-    parser = PADParser(stream)
-    tree = parser.formula()
-    # we can traverse the concrete tree and create
-    # our internal-representation tree now
-    builder = FormulaBuilder()
-    walker = ParseTreeWalker()
-    walker.walk(builder, tree)
-    return builder.getFormula()
+    return Formula.fromString(s)
 
 
 class TransformTests(unittest.TestCase):
