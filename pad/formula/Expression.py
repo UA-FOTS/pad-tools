@@ -77,12 +77,21 @@ class Expression:
                     s += "n" + str(cur) + " -- n" + str(rightNode) + ";\n"
             # otherwise, just make a node with a label
             else:
-                s += "n" + str(cur) + "[label=\"" + str(node) + "\"];\n"
+                s += "n" + str(cur) + "[shape=plaintext,label=\"" +\
+                    str(node) + "\"];\n"
             return cur
 
         _recDot(self)
         s += "}"
         return s
+
+    def eval(self, val):
+        if self.t == Expression.Type.NOT:
+            return not self.left.eval(val)
+        elif self.t == Expression.Type.AND:
+            return self.left.eval(val) and self.right.eval(val)
+        elif self.t == Expression.Type.OR:
+            return self.left.eval(val) or self.right.eval(val)
 
     def dumpDot(self, fname):
         f = open(fname, "w")
@@ -116,6 +125,24 @@ class Predicate(Expression):
     def __str__(self):
         return self.left.__str__() + " " + Predicate.typeStr[self.t] +\
             " " + self.right.__str__()
+
+    def eval(self, val):
+        leftPoly = self.left.eval(val)
+        rightPoly = self.right.eval(val)
+        if self.t == Predicate.Type.EQ:
+            return leftPoly == rightPoly
+        elif self.t == Predicate.Type.NEQ:
+            return leftPoly != rightPoly
+        elif self.t == Predicate.Type.LE:
+            return leftPoly < rightPoly
+        elif self.t == Predicate.Type.LEQ:
+            return leftPoly <= rightPoly
+        elif self.t == Predicate.Type.GE:
+            return leftPoly > rightPoly
+        elif self.t == Predicate.Type.GEQ:
+            return leftPoly >= rightPoly
+        elif self.t == Predicate.Type.DIV:
+            return (rightPoly % leftPoly) == 0
 
     def dotLabel(self):
         return "[shape=box,label=" + "\"" + Predicate.typeStr[self.t] + "\"]"

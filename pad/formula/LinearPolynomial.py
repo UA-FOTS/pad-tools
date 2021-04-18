@@ -26,6 +26,15 @@ class LinearPolynomial:
         for k in self.poly:
             self.poly[k] *= -1
 
+    def eval(self, val):
+        total = 0
+        for k in self.poly:
+            if k == "":
+                total += self.poly[k]
+            else:
+                total += self.poly[k] * val[k]
+        return total
+
     def __add__(self, f):
         g = dict(self.poly)
         for k in f.poly:

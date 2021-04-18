@@ -40,6 +40,27 @@ def parseFromString(s):
 
 class ParserTests(unittest.TestCase):
 
+    def testLinPoly1(self):
+        formula = parseFromString("x1 > 10")
+        self.assertTrue(formula.getExpression().eval({"x1": 20}))
+        self.assertFalse(formula.getExpression().eval({"x1": 10}))
+
+    def testLinPoly2(self):
+        formula = parseFromString("x1 > 10 && x2 < x1")
+        self.assertTrue(formula.getExpression().eval({"x1": 20, "x2": 10}))
+        self.assertFalse(formula.getExpression().eval({"x1": 11, "x2": 11}))
+
+    def testLinPoly3(self):
+        formula = parseFromString("x1 > 10 && x2 < x1 || x3 % y")
+        self.assertTrue(formula.getExpression().eval({"x1": 20,
+                                                      "x2": 10,
+                                                      "x3": 3,
+                                                      "y": 5}))
+        self.assertTrue(formula.getExpression().eval({"x1": 11,
+                                                      "x2": 11,
+                                                      "x3": 3,
+                                                      "y": 9}))
+
     def testExpression1(self):
         formula = parseFromString("E x1 A y3 : x1=1 || ~(y3!=0) && x2<-3")
         self.assertEqual(str(formula.getExpression()),

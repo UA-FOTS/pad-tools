@@ -18,7 +18,7 @@ along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 */
 grammar PAD;
 
-formula    : quants qfexpr ;
+formula    : quants qfexpr | qfexpr;
 
 quants     : QUANT VARIABLE quants  # RecQuant
            | QUANT VARIABLE ':'     # Quant

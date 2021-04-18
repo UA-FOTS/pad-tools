@@ -18,6 +18,9 @@ def main(fname):
     walker.walk(builder, tree)
     print(str(builder.getFormula()))
     builder.getFormula().getExpression().dumpDot("exp.dot")
+    print(str(builder.getFormula().getExpression().eval({"x1": 2,
+                                                         "x2": -5,
+                                                         "y3": 8})))
 
 
 if __name__ == '__main__':
