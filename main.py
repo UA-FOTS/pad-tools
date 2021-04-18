@@ -17,6 +17,7 @@ def main(fname):
     walker = ParseTreeWalker()
     walker.walk(builder, tree)
     print(str(builder.getFormula()))
+    builder.getFormula().getExpression().dumpDot("exp.dot")
 
 
 if __name__ == '__main__':
