@@ -5,7 +5,7 @@ Library to manipulate Presburger arithmetic formulas with divisibility
 
 ## Functionality
 - [X] Parse prenex normal form PAD formulas
-- [X] Output expression part of a formula as dot string/file
+- [X] Output quantifier-free expression part of a formula as dot string/file
 - [X] Evaluate an expression on a given variable valuation
 - [ ] ...
 
