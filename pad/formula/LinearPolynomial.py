@@ -77,8 +77,8 @@ class LinearPolynomial:
                 return "-"
             else:
                 return str(c) + "*"
-        monomials = [coeffStr(v) + k
-                     for k, v in self.poly.items()
+        monomials = [coeffStr(self.poly[k]) + k
+                     for k in sorted(self.poly)
                      if k != ""]
         if "" in self.poly:
             monomials.append(str(self.poly[""]))
