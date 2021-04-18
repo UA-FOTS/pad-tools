@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 """
 
+from collections import OrderedDict
 from enum import Enum
 
 
@@ -26,7 +27,7 @@ class Formula:
         EXIST = 2
 
     def __init__(self):
-        self.quants = []
+        self.quants = OrderedDict()
         self.quantd = set()
         self.qfexpr = None
 
@@ -39,11 +40,11 @@ class Formula:
     def addQuant(self, t, var):
         if var in self.quantd:
             raise Exception("Quantified " + var + " more than once!")
-        self.quants.append((t, var))
+        self.quants[var] = t
         self.quantd.add(var)
 
     def __str__(self):
         quantType = {Formula.QuantType.UNIV: "A",
                      Formula.QuantType.EXIST: "E"}
-        qs = [quantType[t] + " " + var for (t, var) in self.quants]
+        qs = [quantType[t] + " " + var for var, t in self.quants.items()]
         return " ".join(qs) + ": " + self.qfexpr.__str__()
