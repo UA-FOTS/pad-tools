@@ -53,40 +53,39 @@ class Expression:
                 Expression.typeStr[self.t] +\
                 " (" + self.right.__str__() + ")"
 
+    def _recDNF(node):
+        if node.t not in [Expression.Type.AND,
+                          Expression.Type.OR]:
+            return node
+        else:
+            newLeft = node.left.DNF()
+            newRight = node.right.DNF()
+            if node.t == Expression.Type.AND:
+                canDistribute = False
+                if newLeft.t == Expression.Type.OR:
+                    conjunct = newRight
+                    disj1 = newLeft.left
+                    disj2 = newLeft.right
+                    canDistribute = True
+                elif newRight.t == Expression.Type.OR:
+                    conjunct = newLeft
+                    disj1 = newRight.left
+                    disj2 = newRight.right
+                    canDistribute = True
+                if canDistribute:
+                    conj1 = Expression(Expression.Type.AND,
+                                       conjunct, disj1)
+                    conj2 = Expression(Expression.Type.AND,
+                                       conjunct, disj2)
+                    return Expression(Expression.Type.OR,
+                                      conj1, conj2)
+            return node
+
     def DNF(self):
         nnfExp = self.NNF()
+        return Expression._recDNF(nnfExp)
 
-        def _recDNF(node):
-            if node.t not in [Expression.Type.AND,
-                              Expression.Type.OR]:
-                return node
-            else:
-                newLeft = node.left.DNF()
-                newRight = node.right.DNF()
-                if node.t == Expression.Type.AND:
-                    canDistribute = False
-                    if newLeft.t == Expression.Type.OR:
-                        conjunct = newRight
-                        disj1 = newLeft.left
-                        disj2 = newLeft.right
-                        canDistribute = True
-                    elif newRight.t == Expression.Type.OR:
-                        conjunct = newLeft
-                        disj1 = newRight.left
-                        disj2 = newRight.right
-                        canDistribute = True
-                    if canDistribute:
-                        conj1 = Expression(Expression.Type.AND,
-                                           conjunct, disj1)
-                        conj2 = Expression(Expression.Type.AND,
-                                           conjunct, disj2)
-                        return Expression(Expression.Type.OR,
-                                          conj1, conj2)
-                return node
-
-        return _recDNF(nnfExp)
-
-    def NNF(self, neg=False):
+    def NNF(self, neg=False, LNNF=False):
         if self.t == Expression.Type.NOT:
             return self.left.NNF(not neg)
         else:
@@ -95,9 +94,13 @@ class Expression:
                 newT = Expression.Type.OR
             elif neg and self.t == Expression.Type.OR:
                 newT = Expression.Type.AND
-            newLeft = self.left.NNF(neg)
-            newRight = self.right.NNF(neg)
+            newLeft = self.left.NNF(neg, LNNF)
+            newRight = self.right.NNF(neg, LNNF)
             return Expression(newT, newLeft, newRight)
+
+    def LNF(self):
+        lnnfExp = self.NNF(LNNF=True)
+        return Expression._recDNF(lnnfExp)
 
     def dotLabel(self):
         return "[label=" + "\"" + Expression.typeStr[self.t] + "\"]"
@@ -172,7 +175,7 @@ class Predicate(Expression):
         return self.left.__str__() + " " + Predicate.typeStr[self.t] +\
             " " + self.right.__str__()
 
-    def NNF(self, neg=False):
+    def _NNF(self, neg=False):
         if not neg:
             return self
         elif self.t == Predicate.Type.EQ:
@@ -189,6 +192,31 @@ class Predicate(Expression):
             return Predicate(Predicate.Type.LE, self.left, self.right)
         elif self.t == Predicate.Type.DIV:
             return self.invert()
+
+    def _LNNF(self, neg=False):
+        if neg and self.t == Predicate.Type.DIV:
+            # special case
+            pass
+        else:
+            nnfNode = self._NNF(neg)
+            if nnfNode.t == Predicate.Type.NEQ:
+                leq = Predicate(Predicate.Type.LEQ,
+                                self.left + 1, self.right)
+                geq = Predicate(Predicate.Type.GEQ,
+                                self.left, self.right + 1)
+                return Expression(Expression.Type.OR, leq, geq)
+            elif nnfNode.t == Predicate.Type.LE:
+                return Predicate(Predicate.Type.LEQ,
+                                 self.left + 1, self.right)
+            elif nnfNode.t == Predicate.Type.GE:
+                return Predicate(Predicate.Type.GEQ,
+                                 self.left, self.right + 1)
+
+    def NNF(self, neg=False, LNNF=False):
+        if LNNF:
+            return self._LNNF(neg)
+        else:
+            return self._NNF(neg)
 
     def eval(self, val):
         leftPoly = self.left.eval(val)

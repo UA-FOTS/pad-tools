@@ -37,12 +37,20 @@ class LinearPolynomial:
 
     def __add__(self, f):
         g = dict(self.poly)
-        for k in f.poly:
-            if k in self.poly:
-                g[k] += f.poly[k]
+        if isinstance(f, int):
+            if "" in self.poly:
+                self.poly[""] += f
             else:
-                g[k] = f.poly[k]
-        return LinearPolynomial(g)
+                self.poly[""] = f
+        elif isinstance(f, self.__class__):
+            for k in f.poly:
+                if k in self.poly:
+                    g[k] += f.poly[k]
+                else:
+                    g[k] = f.poly[k]
+            return LinearPolynomial(g)
+        else:
+            raise Exception("Cannot add " + str(f) + " to a polynomial!")
 
     def __sub__(self, f):
         g = dict(self.poly)
