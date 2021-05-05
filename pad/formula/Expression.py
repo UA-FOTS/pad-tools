@@ -27,6 +27,16 @@ class Expression:
         OR = 2
         NOT = 3
 
+    nextVar = 0
+
+    def freshVars(amount):
+        vs = []
+        while len(vs) < amount:
+            vname = "_fresh" + str(Expression.nextVar)
+            vs.append(vname)
+            Expression.nextVar += 1
+        return tuple(vs)
+
     def __init__(self, t, left, right=None):
         self.t = t
         self.left = left
@@ -88,7 +98,7 @@ class Expression:
 
     def NNF(self, neg=False, LNNF=False):
         if self.t == Expression.Type.NOT:
-            return self.left.NNF(not neg)
+            return self.left.NNF(not neg, LNNF)
         else:
             newT = self.t
             if neg and self.t == Expression.Type.AND:
@@ -192,20 +202,20 @@ class Predicate(Expression):
         elif self.t == Predicate.Type.GEQ:
             return Predicate(Predicate.Type.LE, self.left, self.right)
         elif self.t == Predicate.Type.DIV:
-            return self.invert()
+            return ~self
 
     def _LNNF(self, neg=False):
         if neg and self.t == Predicate.Type.DIV:
             # either the LHS is 0 and the right is not
-            lhs0 = Predicate.Type.EQ(self.left, LinearPolynomial({"": 0}))
+            lhs0 = Predicate(Predicate.Type.EQ, self.left,
+                             LinearPolynomial({"": 0}))
             rhsleq0 = Predicate(Predicate.Type.LEQ,
                                 self.left + 1, self.right)
             rhsgeq0 = Predicate(Predicate.Type.GEQ,
                                 self.left, self.right + 1)
-            rhsnot0 = Expression(Expression.Type.OR, rhsleq0, rhsgeq0)
-            case1 = Expression(Expression.Type.OR, lhs0, rhsnot0)
+            case1 = lhs0 | rhsleq0 | rhsgeq0
             # or we can quantify a non-zero remainder
-            temp1, temp2 = self.left.freshVars()
+            temp1, temp2 = Expression.freshVars(2)
             qrem = Predicate(Predicate.Type.EQ,
                              self.left, LinearPolynomial({temp1: 1, temp2: 1}))
             quot = Predicate(Predicate.Type.DIV,
@@ -214,14 +224,10 @@ class Predicate(Expression):
             g1 = Predicate(Predicate.Type.LEQ, LinearPolynomial({"": 1}),
                            rempoly)
             lf1 = Predicate(Predicate.Type.LEQ, rempoly, self.left - 1)
-            bndrem1 = Expression(Expression.Type.AND, g1, lf1)
             lnf1 = Predicate(Predicate.Type.LEQ, rempoly, (self.left * -1) - 1)
-            bndrem2 = Expression(Expression.Type.AND, g1, lnf1)
-            bnds = Expression(Expression.Type.OR, bndrem1, bndrem2)
-            case2 = Expression(Expression.Type.AND, bnds,
-                               Expression(Expression.Type.AND, qrem, quot))
+            case2 = qrem & quot & ((g1 & lf1) | (g1 & lnf1))
             # return the disjunction
-            return Expression(Expression.Type.OR, case1, case2)
+            return case1 | case2
         else:
             nnfNode = self._NNF(neg)
             if nnfNode.t == Predicate.Type.NEQ:
@@ -229,7 +235,7 @@ class Predicate(Expression):
                                 nnfNode.left + 1, nnfNode.right)
                 geq = Predicate(Predicate.Type.GEQ,
                                 nnfNode.left, nnfNode.right + 1)
-                return Expression(Expression.Type.OR, leq, geq)
+                return leq | geq
             elif nnfNode.t == Predicate.Type.LE:
                 return Predicate(Predicate.Type.LEQ,
                                  nnfNode.left + 1, nnfNode.right)
@@ -240,6 +246,7 @@ class Predicate(Expression):
                 return nnfNode
 
     def NNF(self, neg=False, LNNF=False):
+        print(str(self.t) + str(neg) + str(LNNF))
         if LNNF:
             return self._LNNF(neg)
         else:
