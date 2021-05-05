@@ -6,9 +6,9 @@ def main(fname):
     formula = Formula.fromFile(fname)
     print(str(formula))
     formula.getExpression().dumpDot("exp.dot")
-    print(str(formula.getExpression().eval({"x1": 2,
-                                            "x2": -5,
-                                            "y3": 8})))
+    lnnf = formula.getExpression().NNF(LNNF=True)
+    print(str(lnnf))
+    lnnf.dumpDot("lnnf-exp.dot")
 
 
 if __name__ == '__main__':

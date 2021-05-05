@@ -35,13 +35,24 @@ class LinearPolynomial:
                 total += self.poly[k] * val[k]
         return total
 
+    def freshVars(self, amount):
+        vs = []
+        i = 0
+        while len(vs) < amount:
+            vname = "temp" + str(i)
+            if vname not in self.poly:
+                vs.append(vname)
+            i += 1
+        return tuple(vs)
+
     def __add__(self, f):
         g = dict(self.poly)
         if isinstance(f, int):
             if "" in self.poly:
-                self.poly[""] += f
+                g[""] += f
             else:
-                self.poly[""] = f
+                g[""] = f
+            return LinearPolynomial(g)
         elif isinstance(f, self.__class__):
             for k in f.poly:
                 if k in self.poly:
