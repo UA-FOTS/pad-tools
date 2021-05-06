@@ -18,6 +18,7 @@ along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 """
 
 from enum import Enum
+from functools import reduce
 from .LinearPolynomial import LinearPolynomial
 
 
@@ -65,31 +66,31 @@ class Expression:
                 " (" + self.right.__str__() + ")"
 
     def _recDNF(node):
-        if node.t not in [Expression.Type.AND,
-                          Expression.Type.OR]:
+        leaves = []
+
+        def conjLeaves(n):
+            nonlocal leaves
+            if n.t == Expression.Type.AND:
+                conjLeaves(n.left)
+                conjLeaves(n.right)
+            else:
+                leaves.append(n)
+
+        if node.t == Expression.Type.OR:
+            return (Expression._recDNF(node.left) |
+                    Expression._recDNF(node.right))
+        elif node.t == Expression.Type.AND:
+            conjLeaves(node)
+            for i in range(len(leaves)):
+                n = leaves[i]
+                if n.t == Expression.Type.OR:
+                    leaves.pop(i)
+                    conj = reduce(lambda x, y: x & y, leaves)
+                    newLeft = Expression._recDNF(conj & n.left)
+                    newRight = Expression._recDNF(conj & n.right)
+                    return newLeft | newRight
             return node
         else:
-            newLeft = node.left.DNF()
-            newRight = node.right.DNF()
-            if node.t == Expression.Type.AND:
-                canDistribute = False
-                if newLeft.t == Expression.Type.OR:
-                    conjunct = newRight
-                    disj1 = newLeft.left
-                    disj2 = newLeft.right
-                    canDistribute = True
-                elif newRight.t == Expression.Type.OR:
-                    conjunct = newLeft
-                    disj1 = newRight.left
-                    disj2 = newRight.right
-                    canDistribute = True
-                if canDistribute:
-                    conj1 = Expression(Expression.Type.AND,
-                                       conjunct, disj1)
-                    conj2 = Expression(Expression.Type.AND,
-                                       conjunct, disj2)
-                    return Expression(Expression.Type.OR,
-                                      conj1, conj2)
             return node
 
     def DNF(self):

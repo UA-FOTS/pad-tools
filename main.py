@@ -6,7 +6,7 @@ def main(fname):
     formula = Formula.fromFile(fname)
     print(str(formula))
     formula.getExpression().dumpDot("exp.dot")
-    lnf = formula.getExpression().DNF()
+    lnf = formula.getExpression().NNF(LNNF=True)
     print(str(lnf))
     lnf.dumpDot("lnf-exp.dot")
 

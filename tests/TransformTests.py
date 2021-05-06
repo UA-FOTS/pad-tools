@@ -19,6 +19,7 @@ along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 
 import unittest
 
+from pad.formula.Expression import Expression
 from pad.formula.Formula import Formula
 
 
@@ -53,18 +54,46 @@ class TransformTests(unittest.TestCase):
                          "&& (10*x1 + -5*x2 + 1 <= -3))")
 
     def testLNNF2(self):
+        Expression.nextVar = 0
         formula = parseFromString("((x1 = 1) || ((~(y3 != 0)) && (10*x1 "
                                   "+ -5*x2 < -3))) || (~(-52*x1 + y3 % "
                                   "-10*x2))")
         nnfExp = formula.getExpression().NNF(LNNF=True)
         self.assertEqual(str(nnfExp),
-                         "((x1 = 1) || ((y3 = 0) && (10*x1 + -5*x2 + "
-                         "1 <= -3))) || (((-52*x1 + y3 = 0) && ((-52*x1 "
-                         "+ y3 + 1 <= -10*x2) || (-10*x2 + 1 <= -52*x1 "
-                         "+ y3))) || (((-52*x1 + y3 = _new0 + _new1) && "
-                         "(-52*x1 + y3 % _new0)) && (((1 <= _new1) && "
-                         "(_new1 <= -52*x1 + y3 + -1)) || ((1 <= _new1) "
-                         "&& (_new1 <= 52*x1 + -y3 + -1)))))")
+                         "((x1 = 1) || ((y3 = 0) && (10*x1 + -5*x2 + 1 <= "
+                         "-3))) || (((-52*x1 + y3 = 0) && ((-52*x1 + y3 + 1 "
+                         "<= -10*x2) || (-10*x2 + 1 <= "
+                         "-52*x1 + y3))) || (((-52*x1 "
+                         "+ y3 = _new0 + _new1) && (-52*x1 + y3 % _new0)) && "
+                         "(((1 <= _new1) && (_new1 <= -52*x1 + y3 + -1)) || "
+                         "((1 <= _new1) && (_new1 <= 52*x1 + -y3 + -1)))))")
+
+    def testLNF1(self):
+        formula = parseFromString("(x1 = 1) && ((x2 = 2) || ((x1 < x3) && "
+                                  "((x3 < x5) || (x5 = x3))))")
+        lnfExp = formula.getExpression().LNF()
+        self.assertEqual(str(lnfExp),
+                         "((x1 = 1) && (x2 = 2)) || ((((x1 = 1) && (x1 + 1 "
+                         "<= x3)) && (x3 + 1 <= x5)) || (((x1 = 1) && (x1 + "
+                         "1 <= x3)) && (x5 = x3)))")
+
+    def testLNF2(self):
+        Expression.nextVar = 0
+        formula = parseFromString("((x1 = 1) && (~(y3 != 0))) && ((10*x1 + "
+                                  "-5*x2 < -3) || (~(-52*x1 + y3 % -10*x2)))")
+        lnfExp = formula.getExpression().LNF()
+        self.assertEqual(str(lnfExp),
+                         "(((x1 = 1) && (y3 = 0)) && (10*x1 + -5*x2 + 1 <= "
+                         "-3)) || ((((((x1 = 1) && (y3 = 0)) && (-52*x1 + y3 "
+                         "= 0)) && (-52*x1 + y3 + 1 <= -10*x2)) || ((((x1 = "
+                         "1) && (y3 = 0)) && (-52*x1 + y3 = 0)) && (-10*x2 + "
+                         "1 <= -52*x1 + y3))) || ((((((x1 = 1) && (y3 = 0)) "
+                         "&& (-52*x1 + y3 = _new0 + _new1)) && (-52*x1 + y3 "
+                         "% _new0)) && ((1 <= _new1) && (_new1 <= -52*x1 + "
+                         "y3 + -1))) || (((((x1 = 1) && (y3 = 0)) && (-52*x1 "
+                         "+ y3 = _new0 + _new1)) && (-52*x1 + y3 % _new0)) "
+                         "&& ((1 <= _new1) && (_new1 <= 52*x1 + -y3 "
+                         "+ -1)))))")
 
     def testDNF1(self):
         formula = parseFromString("x1 > 10 && ~(x2 <= x1)")
