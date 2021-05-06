@@ -117,29 +117,33 @@ class Expression:
         return "[label=" + "\"" + Expression.typeStr[self.t] + "\"]"
 
     def dotStr(self):
-        i = 0
         s = "graph Formula {\n"
+        visited = []
 
         def _recDot(node):
-            nonlocal i, s
-            cur = i
-            i += 1
+            nonlocal s, visited
             # recursive calls for expressions
             if isinstance(node, Expression):
                 if node.left is not None:
-                    leftNode = _recDot(node.left)
+                    leftNode = node.left
+                    if id(node.left) not in visited:
+                        _recDot(node.left)
                 if node.right is not None:
-                    rightNode = _recDot(node.right)
-                s += "n" + str(cur) + node.dotLabel() + ";\n"
+                    rightNode = node.right
+                    if id(node.right) not in visited:
+                        _recDot(node.right)
+                s += "n" + str(id(node)) + node.dotLabel() + ";\n"
                 if node.left is not None:
-                    s += "n" + str(cur) + " -- n" + str(leftNode) + ";\n"
+                    s += "n" + str(id(node)) + " -- n"
+                    s += str(id(leftNode)) + ";\n"
                 if node.right is not None:
-                    s += "n" + str(cur) + " -- n" + str(rightNode) + ";\n"
+                    s += "n" + str(id(node)) + " -- n"
+                    s += str(id(rightNode)) + ";\n"
             # otherwise, just make a node with a label
             else:
-                s += "n" + str(cur) + "[shape=plaintext,label=\"" +\
+                s += "n" + str(id(node)) + "[shape=plaintext,label=\"" +\
                     str(node) + "\"];\n"
-            return cur
+            visited.append(id(node))
 
         _recDot(self)
         s += "}"
