@@ -59,14 +59,14 @@ class LinearPolynomial:
             if "" in self.poly:
                 g[""] -= f
             else:
-                g[""] = f
+                g[""] = f * -1
             return LinearPolynomial(g)
         elif isinstance(f, self.__class__):
             for k in f.poly:
                 if k in self.poly:
                     g[k] -= f.poly[k]
                 else:
-                    g[k] = f.poly[k]
+                    g[k] = f.poly[k] * -1
             return LinearPolynomial(g)
         else:
             raise Exception("Can't subtract " + str(f) + " from a polynomial!")

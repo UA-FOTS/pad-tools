@@ -44,6 +44,28 @@ class TransformTests(unittest.TestCase):
         self.assertEqual(str(nnfExp),
                          "((x1 <= 10) && (y + 32 != 5)) && (x2 > x1)")
 
+    def testLNNF1(self):
+        formula = parseFromString("E x1 A y3: (x1 = 1) || ((~(y3 != 0)) "
+                                  "&& (10*x1 + -5*x2 < -3))")
+        nnfExp = formula.getExpression().NNF(LNNF=True)
+        self.assertEqual(str(nnfExp),
+                         "(x1 = 1) || ((y3 = 0) "
+                         "&& (10*x1 + -5*x2 + 1 <= -3))")
+
+    def testLNNF2(self):
+        formula = parseFromString("((x1 = 1) || ((~(y3 != 0)) && (10*x1 "
+                                  "+ -5*x2 < -3))) || (~(-52*x1 + y3 % "
+                                  "-10*x2))")
+        nnfExp = formula.getExpression().NNF(LNNF=True)
+        self.assertEqual(str(nnfExp),
+                         "((x1 = 1) || ((y3 = 0) && (10*x1 + -5*x2 + "
+                         "1 <= -3))) || (((-52*x1 + y3 = 0) && ((-52*x1 "
+                         "+ y3 + 1 <= -10*x2) || (-10*x2 + 1 <= -52*x1 "
+                         "+ y3))) || (((-52*x1 + y3 = _new0 + _new1) && "
+                         "(-52*x1 + y3 % _new0)) && (((1 <= _new1) && "
+                         "(_new1 <= -52*x1 + y3 + -1)) || ((1 <= _new1) "
+                         "&& (_new1 <= 52*x1 + -y3 + -1)))))")
+
     def testDNF1(self):
         formula = parseFromString("x1 > 10 && ~(x2 <= x1)")
         dnfExp = formula.getExpression().DNF()

@@ -32,7 +32,7 @@ class Expression:
     def freshVars(amount):
         vs = []
         while len(vs) < amount:
-            vname = "_fresh" + str(Expression.nextVar)
+            vname = "_new" + str(Expression.nextVar)
             vs.append(vname)
             Expression.nextVar += 1
         return tuple(vs)
@@ -211,9 +211,9 @@ class Predicate(Expression):
                              LinearPolynomial({"": 0}))
             rhsleq0 = Predicate(Predicate.Type.LEQ,
                                 self.left + 1, self.right)
-            rhsgeq0 = Predicate(Predicate.Type.GEQ,
-                                self.left, self.right + 1)
-            case1 = lhs0 | rhsleq0 | rhsgeq0
+            rhsgeq0 = Predicate(Predicate.Type.LEQ,
+                                self.right + 1, self.left)
+            case1 = lhs0 & (rhsleq0 | rhsgeq0)
             # or we can quantify a non-zero remainder
             temp1, temp2 = Expression.freshVars(2)
             qrem = Predicate(Predicate.Type.EQ,
@@ -233,20 +233,22 @@ class Predicate(Expression):
             if nnfNode.t == Predicate.Type.NEQ:
                 leq = Predicate(Predicate.Type.LEQ,
                                 nnfNode.left + 1, nnfNode.right)
-                geq = Predicate(Predicate.Type.GEQ,
-                                nnfNode.left, nnfNode.right + 1)
+                geq = Predicate(Predicate.Type.LEQ,
+                                nnfNode.right + 1, nnfNode.left)
                 return leq | geq
             elif nnfNode.t == Predicate.Type.LE:
                 return Predicate(Predicate.Type.LEQ,
                                  nnfNode.left + 1, nnfNode.right)
             elif nnfNode.t == Predicate.Type.GE:
-                return Predicate(Predicate.Type.GEQ,
-                                 nnfNode.left, nnfNode.right + 1)
+                return Predicate(Predicate.Type.LEQ,
+                                 nnfNode.right + 1, nnfNode.left)
+            elif nnfNode.t == Predicate.Type.GEQ:
+                return Predicate(Predicate.Type.LEQ,
+                                 nnfNode.right, nnfNode.left)
             else:
                 return nnfNode
 
     def NNF(self, neg=False, LNNF=False):
-        print(str(self.t) + str(neg) + str(LNNF))
         if LNNF:
             return self._LNNF(neg)
         else:
