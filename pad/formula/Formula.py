@@ -51,6 +51,8 @@ class Formula:
         self.quantd.add(var)
 
     def __str__(self):
+        if len(self.quants) == 0:
+            return self.qfexpr.__str__()
         quantType = {Formula.QuantType.UNIV: "A",
                      Formula.QuantType.EXIST: "E"}
         qs = [quantType[t] + " " + var for var, t in self.quants.items()]

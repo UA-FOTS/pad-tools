@@ -37,32 +37,56 @@ class LinearPolynomial:
 
     def __add__(self, f):
         g = dict(self.poly)
-        for k in f.poly:
-            if k in self.poly:
-                g[k] += f.poly[k]
+        if isinstance(f, int):
+            if "" in self.poly:
+                g[""] += f
             else:
-                g[k] = f.poly[k]
-        return LinearPolynomial(g)
+                g[""] = f
+            return LinearPolynomial(g)
+        elif isinstance(f, self.__class__):
+            for k in f.poly:
+                if k in self.poly:
+                    g[k] += f.poly[k]
+                else:
+                    g[k] = f.poly[k]
+            return LinearPolynomial(g)
+        else:
+            raise Exception("Cannot add " + str(f) + " to a polynomial!")
 
     def __sub__(self, f):
         g = dict(self.poly)
-        for k in f.poly:
-            if k in self.poly:
-                g[k] -= f.poly[k]
+        if isinstance(f, int):
+            if "" in self.poly:
+                g[""] -= f
             else:
-                g[k] = f.poly[k]
-        return LinearPolynomial(g)
+                g[""] = f * -1
+            return LinearPolynomial(g)
+        elif isinstance(f, self.__class__):
+            for k in f.poly:
+                if k in self.poly:
+                    g[k] -= f.poly[k]
+                else:
+                    g[k] = f.poly[k] * -1
+            return LinearPolynomial(g)
+        else:
+            raise Exception("Can't subtract " + str(f) + " from a polynomial!")
 
     def __mul__(self, f):
-        # Either self is a constant polynomial
-        if len(self.poly.keys()) == 1 and "" in self.poly:
+        # Simple multiplication by constant
+        if isinstance(f, int):
+            g = dict(self.poly)
+            for k in self.poly:
+                g[k] *= f
+            return LinearPolynomial(g)
+        # Remaining cases: either self is a constant polynomial
+        elif len(self.poly.keys()) == 1 and "" in self.poly:
             g = dict(f.poly)
             for k in f.poly:
                 g[k] *= self.poly[""]
             return LinearPolynomial(g)
         # or f is the constant
         elif len(f.poly.keys()) == 1 and "" in f.poly:
-            f = dict(self.poly)
+            g = dict(self.poly)
             for k in self.poly:
                 g[k] *= f.poly[""]
             return LinearPolynomial(g)

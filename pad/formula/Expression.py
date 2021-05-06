@@ -18,6 +18,8 @@ along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 """
 
 from enum import Enum
+from functools import reduce
+from .LinearPolynomial import LinearPolynomial
 
 
 class Expression:
@@ -25,6 +27,16 @@ class Expression:
         AND = 1
         OR = 2
         NOT = 3
+
+    nextVar = 0
+
+    def freshVars(amount):
+        vs = []
+        while len(vs) < amount:
+            vname = "_new" + str(Expression.nextVar)
+            vs.append(vname)
+            Expression.nextVar += 1
+        return tuple(vs)
 
     def __init__(self, t, left, right=None):
         self.t = t
@@ -53,79 +65,86 @@ class Expression:
                 Expression.typeStr[self.t] +\
                 " (" + self.right.__str__() + ")"
 
+    def _recDNF(node):
+        leaves = []
+
+        def conjLeaves(n):
+            nonlocal leaves
+            if n.t == Expression.Type.AND:
+                conjLeaves(n.left)
+                conjLeaves(n.right)
+            else:
+                leaves.append(n)
+
+        if node.t == Expression.Type.OR:
+            return (Expression._recDNF(node.left) |
+                    Expression._recDNF(node.right))
+        elif node.t == Expression.Type.AND:
+            conjLeaves(node)
+            for i in range(len(leaves)):
+                n = leaves[i]
+                if n.t == Expression.Type.OR:
+                    leaves.pop(i)
+                    conj = reduce(lambda x, y: x & y, leaves)
+                    newLeft = Expression._recDNF(conj & n.left)
+                    newRight = Expression._recDNF(conj & n.right)
+                    return newLeft | newRight
+            return node
+        else:
+            return node
+
     def DNF(self):
         nnfExp = self.NNF()
+        return Expression._recDNF(nnfExp)
 
-        def _recDNF(node):
-            if node.t not in [Expression.Type.AND,
-                              Expression.Type.OR]:
-                return node
-            else:
-                newLeft = node.left.DNF()
-                newRight = node.right.DNF()
-                if node.t == Expression.Type.AND:
-                    canDistribute = False
-                    if newLeft.t == Expression.Type.OR:
-                        conjunct = newRight
-                        disj1 = newLeft.left
-                        disj2 = newLeft.right
-                        canDistribute = True
-                    elif newRight.t == Expression.Type.OR:
-                        conjunct = newLeft
-                        disj1 = newRight.left
-                        disj2 = newRight.right
-                        canDistribute = True
-                    if canDistribute:
-                        conj1 = Expression(Expression.Type.AND,
-                                           conjunct, disj1)
-                        conj2 = Expression(Expression.Type.AND,
-                                           conjunct, disj2)
-                        return Expression(Expression.Type.OR,
-                                          conj1, conj2)
-                return node
-
-        return _recDNF(nnfExp)
-
-    def NNF(self, neg=False):
+    def NNF(self, neg=False, LNNF=False):
         if self.t == Expression.Type.NOT:
-            return self.left.NNF(not neg)
+            return self.left.NNF(not neg, LNNF)
         else:
             newT = self.t
             if neg and self.t == Expression.Type.AND:
                 newT = Expression.Type.OR
             elif neg and self.t == Expression.Type.OR:
                 newT = Expression.Type.AND
-            newLeft = self.left.NNF(neg)
-            newRight = self.right.NNF(neg)
+            newLeft = self.left.NNF(neg, LNNF)
+            newRight = self.right.NNF(neg, LNNF)
             return Expression(newT, newLeft, newRight)
+
+    def LNF(self):
+        lnnfExp = self.NNF(LNNF=True)
+        return Expression._recDNF(lnnfExp)
 
     def dotLabel(self):
         return "[label=" + "\"" + Expression.typeStr[self.t] + "\"]"
 
     def dotStr(self):
-        i = 0
         s = "graph Formula {\n"
+        visited = []
 
         def _recDot(node):
-            nonlocal i, s
-            cur = i
-            i += 1
+            nonlocal s, visited
             # recursive calls for expressions
             if isinstance(node, Expression):
                 if node.left is not None:
-                    leftNode = _recDot(node.left)
+                    leftNode = node.left
+                    if id(node.left) not in visited:
+                        _recDot(node.left)
                 if node.right is not None:
-                    rightNode = _recDot(node.right)
-                s += "n" + str(cur) + node.dotLabel() + ";\n"
+                    rightNode = node.right
+                    if id(node.right) not in visited:
+                        _recDot(node.right)
+                s += "n" + str(id(node)) + node.dotLabel() + ";\n"
                 if node.left is not None:
-                    s += "n" + str(cur) + " -- n" + str(leftNode) + ";\n"
+                    s += "n" + str(id(node)) + " -- n"
+                    s += str(id(leftNode)) + ";\n"
                 if node.right is not None:
-                    s += "n" + str(cur) + " -- n" + str(rightNode) + ";\n"
+                    s += "n" + str(id(node)) + " -- n"
+                    s += str(id(rightNode)) + ";\n"
             # otherwise, just make a node with a label
             else:
-                s += "n" + str(cur) + "[shape=plaintext,label=\"" +\
+                s += "n" + str(id(node)) + "[shape=plaintext,label=\"" +\
                     str(node) + "\"];\n"
-            return cur
+            visited.append(id(node))
 
         _recDot(self)
         s += "}"
@@ -172,7 +191,7 @@ class Predicate(Expression):
         return self.left.__str__() + " " + Predicate.typeStr[self.t] +\
             " " + self.right.__str__()
 
-    def NNF(self, neg=False):
+    def _NNF(self, neg=False):
         if not neg:
             return self
         elif self.t == Predicate.Type.EQ:
@@ -188,7 +207,57 @@ class Predicate(Expression):
         elif self.t == Predicate.Type.GEQ:
             return Predicate(Predicate.Type.LE, self.left, self.right)
         elif self.t == Predicate.Type.DIV:
-            return self.invert()
+            return ~self
+
+    def _LNNF(self, neg=False):
+        if neg and self.t == Predicate.Type.DIV:
+            # either the LHS is 0 and the right is not
+            lhs0 = Predicate(Predicate.Type.EQ, self.left,
+                             LinearPolynomial({"": 0}))
+            rhsleq0 = Predicate(Predicate.Type.LEQ,
+                                self.left + 1, self.right)
+            rhsgeq0 = Predicate(Predicate.Type.LEQ,
+                                self.right + 1, self.left)
+            case1 = lhs0 & (rhsleq0 | rhsgeq0)
+            # or we can quantify a non-zero remainder
+            temp1, temp2 = Expression.freshVars(2)
+            qrem = Predicate(Predicate.Type.EQ,
+                             self.left, LinearPolynomial({temp1: 1, temp2: 1}))
+            quot = Predicate(Predicate.Type.DIV,
+                             self.left, LinearPolynomial({temp1: 1}))
+            rempoly = LinearPolynomial({temp2: 1})
+            g1 = Predicate(Predicate.Type.LEQ, LinearPolynomial({"": 1}),
+                           rempoly)
+            lf1 = Predicate(Predicate.Type.LEQ, rempoly, self.left - 1)
+            lnf1 = Predicate(Predicate.Type.LEQ, rempoly, (self.left * -1) - 1)
+            case2 = qrem & quot & ((g1 & lf1) | (g1 & lnf1))
+            # return the disjunction
+            return case1 | case2
+        else:
+            nnfNode = self._NNF(neg)
+            if nnfNode.t == Predicate.Type.NEQ:
+                leq = Predicate(Predicate.Type.LEQ,
+                                nnfNode.left + 1, nnfNode.right)
+                geq = Predicate(Predicate.Type.LEQ,
+                                nnfNode.right + 1, nnfNode.left)
+                return leq | geq
+            elif nnfNode.t == Predicate.Type.LE:
+                return Predicate(Predicate.Type.LEQ,
+                                 nnfNode.left + 1, nnfNode.right)
+            elif nnfNode.t == Predicate.Type.GE:
+                return Predicate(Predicate.Type.LEQ,
+                                 nnfNode.right + 1, nnfNode.left)
+            elif nnfNode.t == Predicate.Type.GEQ:
+                return Predicate(Predicate.Type.LEQ,
+                                 nnfNode.right, nnfNode.left)
+            else:
+                return nnfNode
+
+    def NNF(self, neg=False, LNNF=False):
+        if LNNF:
+            return self._LNNF(neg)
+        else:
+            return self._NNF(neg)
 
     def eval(self, val):
         leftPoly = self.left.eval(val)
