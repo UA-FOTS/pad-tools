@@ -65,6 +65,28 @@ class Expression:
                 Expression.typeStr[self.t] +\
                 " (" + self.right.__str__() + ")"
 
+    def allConsSystems(self):
+        system = []
+
+        def conjLeaves(n):
+            nonlocal system
+            if n.t == Expression.Type.AND:
+                conjLeaves(n.left)
+                conjLeaves(n.right)
+            else:
+                system.append(n)
+
+        toVisit = [self]
+        while len(toVisit) != 0:
+            n = toVisit.pop()
+            if n.t == Expression.Type.OR:
+                toVisit.append(n.left)
+                toVisit.append(n.right)
+            else:
+                system = []
+                conjLeaves(n)
+                yield system
+
     def _recDNF(node):
         leaves = []
 

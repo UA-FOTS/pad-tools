@@ -7,6 +7,8 @@ Library to manipulate Presburger arithmetic formulas with divisibility
 - [X] Parse prenex normal form PAD formulas
 - [X] Output quantifier-free expression part of a formula as dot string/file
 - [X] Evaluate an expression on a given variable valuation
+- [X] Negation normal form, disjunctive normal form transformations
+- [X] Lechner normal form (DNF with no negations on predicates) transformation
 - [ ] ...
 
 ## Notes

@@ -6,9 +6,14 @@ def main(fname):
     formula = Formula.fromFile(fname)
     print(str(formula))
     formula.getExpression().dumpDot("exp.dot")
-    lnf = formula.getExpression().NNF(LNNF=True)
+    lnf = formula.getExpression().LNF()
     print(str(lnf))
     lnf.dumpDot("lnf-exp.dot")
+    for s in lnf.allConsSystems():
+        print("System: ")
+        for p in s:
+            print(str(p))
+        print("System end")
 
 
 if __name__ == '__main__':
