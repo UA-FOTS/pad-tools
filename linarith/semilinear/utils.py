@@ -22,23 +22,14 @@ import numpy as np
 import z3
 
 
-def fromSystemIneqs(A, b):
+def fromSystemIneqs(A, b, C, d):
     """
     Computes the semilinear set of solutions solutions of a set of linear
-    diophantine inequalities  Ax <= b.
-    :param A: The coefficient matrix of Ax <= b.
-    :param b: The constant vector of Ax <= b.
-    :return: A tuple of the bases and the generators (both as a list of numpy
-    arrays).
+    diophantine inequalities  Ax <= b and Cx = d.
     """
-    m = len(A)
     n = len(A[0])
-    print(str("m = " + str(m) + " n = " + str(n)))
-    A_ext = A.copy()
-    A_ext = np.append(A_ext, -1 * np.identity(m), axis=1)
-    print(str(A_ext))
-    generators = getGenerators(A_ext)
-    bases = getBases(A_ext, b)
+    generators = getGenerators(A, C)
+    bases = getBases(A, b, C, d)
     generators_out = []
     bases_out = []
     for g in generators:
@@ -73,24 +64,43 @@ def oneInftyNorm(A):
     return max(temp)
 
 
-def getGenerators(A):
+def getGenerators(A, C):
     """
-    Computes Hilbert basis of the system Ax = 0.
-    :param A: The coefficient matrix of Ax=0.
-    :return: A set of generators for the semilinear set of solutions of Ax=0.
+    Computes Hilbert basis of the system (A | I)(x | y)^T = 0 and Cx= 0.
     """
+    if A is None:
+        m = len(C)
+        n = len(C[0])
+        generator_bound = int((n * oneInftyNorm(C) + 1) ** m)
+        return hilbertBasis(C, generator_bound)
+
     m = len(A)
     n = len(A[0])
+    A_ext = A.copy()
+    A_ext = np.append(A_ext, np.identity(m), axis=1)
+    print("A extended\n" + str(A_ext))
+    if C is not None:
+        A_ext = np.stack(A_ext, C)
+        print("stacked: " + str(A_ext))
     generator_bound = int((n * oneInftyNorm(A) + 1) ** m)
-    return hilbertBasis(A, generator_bound)
+
+    # get a z3 solver instance and get bases
+    solver, vrs = solverFromEquation(A_ext, np.zeros((len(A_ext),), dtype=int),
+                                     generator_bound)
+    no_zero = []
+    for i in range(len(A_ext[0])):
+        if i < n:
+            no_zero.append(vrs[i] != 0)
+        else:
+            solver.add(vrs[i] >= 0)
+    solver.add(z3.Or(no_zero))
+    return getSolutions(solver, vrs)
 
 
-def getBases(A, b):
+def getBases(A, b, C, d):
     """
-    Computes all bases of Ax=b, using the Hilbert basis of (A, -b)x = 0.
-    :param A: The coefficient matrix of Ax = b.
-    :param b: The constant vector of Ax=b.
-    :return: A set of bases of the semilinear set of solutions for Ax=b.
+    Computes all bases of Ax=b and Cx=d, using the Hilbert basis
+    of (A | -b)x = 0 and (C | -d)x = 0
     """
     m = len(A)
     n = len(A[0])
@@ -98,9 +108,20 @@ def getBases(A, b):
         return [np.zeros((n,), dtype=int)]
     base_bound = int(((n + 1) * oneInftyNorm(A) + inftyNorm(b) + 1) ** m)
     A_ext = np.append(A, np.array([-b]).transpose(), axis=1)
-    print(str(A_ext))
-    possible_bases = hilbertBasis(A_ext, base_bound)
-    bases = [sol for sol in possible_bases if sol[n] == 1]
+    print("Extended for bases\n" + str(A_ext))
+
+    # get a z3 solver instance and get the bases
+    solver, vrs = solverFromEquation(A, np.zeros((len(A),), dtype=int),
+                                     base_bound)
+    out = []
+    no_zero = []
+    for i in range(len(A_ext[0])):
+        if i < n:
+            no_zero.append(vrs[i] != 0)
+        else:
+            solver.add(vrs[i] == 1)
+    solver.add(z3.Or(no_zero))
+    bases = getSolutions(solver, vrs)
     out = []
     for base in bases:
         out.append(np.array([base[i] for i in range(n)]))
@@ -118,12 +139,15 @@ def hilbertBasis(A, abs_bound=0, positive=False):
     """
     solver, vrs = solverFromEquation(A, np.zeros((len(A),), dtype=int),
                                      abs_bound, positive)
-    out = []
     no_zero = []
     for var in vrs:
         no_zero.append(var != 0)
     solver.add(z3.Or(no_zero))
+    return getSolutions(solver, vrs)
 
+
+def getSolutions(solver, vrs):
+    out = []
     while solver.check() == z3.sat:
         out.append(solver.model())
         respect_order = []

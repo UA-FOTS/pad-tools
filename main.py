@@ -20,7 +20,7 @@ def main(fname):
     A = np.array([[4, 1],
                   [2, 2]])
     b = np.array([0, 0]).transpose()
-    bases, gens = semilinear.fromSystemIneqs(A, b)
+    bases, gens = semilinear.fromSystemIneqs(A, b, None, None)
     print(str(bases))
     print(str(gens))
 
