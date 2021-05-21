@@ -27,7 +27,11 @@ def fromSystemIneqs(A, b, C, d):
     Computes the semilinear set of solutions solutions of a set of linear
     diophantine inequalities  Ax <= b and Cx = d.
     """
-    n = len(A[0])
+    if A is not None:
+        n = len(A[0])
+    else:
+        assert C is not None
+        n = len(C[0])
     generators = getGenerators(A, C)
     bases = getBases(A, b, C, d)
     generators_out = []
@@ -66,7 +70,9 @@ def oneInftyNorm(A):
 
 def getGenerators(A, C):
     """
-    Computes Hilbert basis of the system (A | I)(x | y)^T = 0 and Cx= 0.
+    Computes Hilbert basis of the system Ax <= 0 and Cx= 0, i.e. the basis
+    of (A | I)(x) = (0)
+       (C | 0)(y) = (0)
     """
     if A is None:
         m = len(C)
@@ -80,9 +86,12 @@ def getGenerators(A, C):
     A_ext = np.append(A_ext, np.identity(m), axis=1)
     print("A extended\n" + str(A_ext))
     if C is not None:
-        A_ext = np.stack(A_ext, C)
+        mc = len(C)
+        C_ext = C.copy()
+        C_ext = np.append(C_ext, np.zeros((mc, mc)), axis=1)
+        A_ext = np.stack(A_ext, C_ext)
         print("stacked: " + str(A_ext))
-    generator_bound = int((n * oneInftyNorm(A) + 1) ** m)
+    generator_bound = int((n * oneInftyNorm(A_ext) + 1) ** m)
 
     # get a z3 solver instance and get bases
     solver, vrs = solverFromEquation(A_ext, np.zeros((len(A_ext),), dtype=int),
@@ -102,29 +111,46 @@ def getBases(A, b, C, d):
     Computes all bases of Ax=b and Cx=d, using the Hilbert basis
     of (A | -b)x = 0 and (C | -d)x = 0
     """
-    m = len(A)
-    n = len(A[0])
+    if A is None:
+        C_ext = np.append(C, np.array([-d]).transpose(), axis=1)
+        m = len(C_ext)
+        n = len(C_ext[0])
+        generator_bound = int((n * oneInftyNorm(C_ext) + 1) ** m)
+        return hilbertBasis(C_ext, generator_bound)
+
     if np.all(b == 0):
-        return [np.zeros((n,), dtype=int)]
-    base_bound = int(((n + 1) * oneInftyNorm(A) + inftyNorm(b) + 1) ** m)
-    A_ext = np.append(A, np.array([-b]).transpose(), axis=1)
+        return [np.zeros((len(A[0]),), dtype=int)]
+
+    A_ext = A.copy()
+    A_ext = np.append(A_ext, np.array([-b]).transpose(), axis=1)
+    print("A extended\n" + str(A_ext))
+    if C is not None:
+        C_ext = C.copy()
+        C_ext = np.append(C_ext, np.array([-d]).transpose(), axis=1)
+        A_ext = np.stack(A_ext, C_ext)
+        print("stacked: " + str(A_ext))
+
+    m = len(A_ext)
+    n = len(A_ext[0])
+
+    # TODO: check bound
+    base_bound = int((n * oneInftyNorm(A_ext) + 1) ** m)
     print("Extended for bases\n" + str(A_ext))
 
     # get a z3 solver instance and get the bases
-    solver, vrs = solverFromEquation(A, np.zeros((len(A),), dtype=int),
+    solver, vrs = solverFromEquation(A_ext, np.zeros((n,), dtype=int),
                                      base_bound)
     out = []
     no_zero = []
-    for i in range(len(A_ext[0])):
-        if i < n:
-            no_zero.append(vrs[i] != 0)
-        else:
-            solver.add(vrs[i] == 1)
+    # the last variable can only be 1, the other are nonzero
+    for i in range(n - 1):
+        no_zero.append(vrs[i] != 0)
+    solver.add(vrs[n - 1] == 1)
     solver.add(z3.Or(no_zero))
     bases = getSolutions(solver, vrs)
     out = []
     for base in bases:
-        out.append(np.array([base[i] for i in range(n)]))
+        out.append(np.array([base[i] for i in range(n - 1)]))
     return out
 
 
