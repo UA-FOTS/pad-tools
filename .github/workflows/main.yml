@@ -30,7 +30,5 @@ jobs:
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
-        python tests/ParserTests.py
-        python tests/TransformTests.py
-        python tests/SemilinearTests.py
+        python -m unittest discover -s tests -p "*Tests.py"
 
