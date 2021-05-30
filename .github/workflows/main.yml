@@ -32,4 +32,5 @@ jobs:
         export PYTHONPATH=$(pwd)
         python tests/ParserTests.py
         python tests/TransformTests.py
+        python tests/SemilinearTests.py
 

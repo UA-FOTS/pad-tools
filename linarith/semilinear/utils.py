@@ -22,27 +22,6 @@ import numpy as np
 import z3
 
 
-def fromSystemIneqs(A, b, C, d):
-    """
-    Computes the semilinear set of solutions solutions of a set of linear
-    diophantine inequalities  Ax <= b and Cx = d.
-    """
-    if A is not None:
-        n = len(A[0])
-    else:
-        assert C is not None
-        n = len(C[0])
-    generators = getGenerators(A, C)
-    bases = getBases(A, b, C, d)
-    generators_out = []
-    bases_out = []
-    for g in generators:
-        generators_out.append(g[:n])
-    for b in bases:
-        bases_out.append(b[:n])
-    return bases_out, minAntichain(generators_out)
-
-
 def inftyNorm(v):
     """
     Computes the infinity norm of a vector. This maximum absolute value of the
