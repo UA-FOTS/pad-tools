@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with pad-tools. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import numpy as np
 import z3
 
 from .utils import getGenerators, getBases, minAntichain
@@ -35,16 +36,16 @@ class HyLinSet:
             assert C is not None
             assert d is not None
             n = len(C[0])
-        generators = getGenerators(A, C)
-        bases = getBases(A, b, C, d)
-        generators_out = []
-        bases_out = []
-        for g in generators:
-            generators_out.append(g[:n])
-        for b in bases:
-            bases_out.append(b[:n])
-        self.bases = bases_out
-        self.generators = minAntichain(generators_out)
+        self.generators = getGenerators(A, C)
+        self.bases = getBases(A, b, C, d)
+        # generators_out = []
+        # bases_out = []
+        # for g in generators:
+        #     generators_out.append(g[:n])
+        # for b in bases:
+        #     bases_out.append(b[:n])
+        # self.bases = bases_out
+        # self.generators = minAntichain(generators_out)
 
     def __str__(self):
         return "Bases: " + str(self.bases) + "\n" +\
@@ -54,6 +55,8 @@ class HyLinSet:
         n = len(vec)
         if n != len(self.bases[0]):
             return False
+        if len(self.generators) == 0:
+            return any(np.array_equal(vec, b) for b in self.bases)
         m = len(self.generators)
         vrs = [z3.Int("g%i" % i) for i in range(m)]
         solver = z3.Solver()

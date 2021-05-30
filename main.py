@@ -19,14 +19,10 @@ def main(fname):
     A = np.array([[4, 1],
                   [2, 2]])
     b = np.array([0, 0]).transpose()
-    slset = HyLinSet(A, b, None, None)
+    slset = HyLinSet(None, None, A, b)
     print(str(slset))
     print(str(np.array([0, 0]).transpose() in slset))
-    print(str(np.array([1, 1]).transpose() in slset))
     print(str(np.array([-1, 1]).transpose() in slset))
-    print(str(np.array([1, -1]).transpose() in slset))
-    print(str(np.array([-10, -10]).transpose() in slset))
-    print(str(np.array([10, -100]).transpose() in slset))
 
 
 if __name__ == '__main__':

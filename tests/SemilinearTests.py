@@ -24,7 +24,7 @@ from linarith.semilinear.HyLinSet import HyLinSet
 
 
 class SemilinearTests(unittest.TestCase):
-    def testNNF1(self):
+    def testAb1(self):
         A = np.array([[4, 1],
                       [2, 2]])
         b = np.array([0, 0]).transpose()
@@ -35,6 +35,14 @@ class SemilinearTests(unittest.TestCase):
         self.assertFalse(np.array([1, -1]).transpose() in slset)
         self.assertTrue(np.array([-10, -10]).transpose() in slset)
         self.assertTrue(np.array([10, -100]).transpose() in slset)
+
+    def testCd1(self):
+        C = np.array([[4, 1],
+                      [2, 2]])
+        d = np.array([0, 0]).transpose()
+        slset = HyLinSet(None, None, C, d)
+        self.assertTrue(np.array([0, 0]).transpose() in slset)
+        self.assertFalse(np.array([-1, 1]).transpose() in slset)
 
 
 if __name__ == '__main__':

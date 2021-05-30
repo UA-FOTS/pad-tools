@@ -58,31 +58,36 @@ def getGenerators(A, C):
         n = len(C[0])
         generator_bound = int((n * oneInftyNorm(C) + 1) ** m)
         return hilbertBasis(C, generator_bound)
+    else:
+        m = len(A)
+        n = len(A[0])
+        A_ext = A.copy()
+        A_ext = np.append(A_ext, np.identity(m), axis=1)
+        n += 1
+        if C is not None:
+            mc = len(C)
+            m += mc
+            C_ext = C.copy()
+            C_ext = np.append(C_ext, np.zeros((mc, mc), dtype=int), axis=1)
+            A_ext = np.stack(A_ext, C_ext)
+        generator_bound = int((n * oneInftyNorm(A_ext) + 1) ** m)
 
-    m = len(A)
-    n = len(A[0])
-    A_ext = A.copy()
-    A_ext = np.append(A_ext, np.identity(m), axis=1)
-    print("A extended\n" + str(A_ext))
-    if C is not None:
-        mc = len(C)
-        C_ext = C.copy()
-        C_ext = np.append(C_ext, np.zeros((mc, mc)), axis=1)
-        A_ext = np.stack(A_ext, C_ext)
-        print("stacked: " + str(A_ext))
-    generator_bound = int((n * oneInftyNorm(A_ext) + 1) ** m)
-
-    # get a z3 solver instance and get bases
-    solver, vrs = solverFromEquation(A_ext, np.zeros((len(A_ext),), dtype=int),
-                                     generator_bound)
-    no_zero = []
-    for i in range(len(A_ext[0])):
-        if i < n:
-            no_zero.append(vrs[i] != 0)
-        else:
-            solver.add(vrs[i] >= 0)
-    solver.add(z3.Or(no_zero))
-    return getSolutions(solver, vrs)
+        # get a z3 solver instance and get bases
+        solver, vrs = solverFromEquation(A_ext,
+                                         np.zeros((len(A_ext),), dtype=int),
+                                         generator_bound)
+        no_zero = []
+        for i in range(len(A_ext[0])):
+            if i < n:
+                no_zero.append(vrs[i] != 0)
+            else:
+                solver.add(vrs[i] >= 0)
+        solver.add(z3.Or(no_zero))
+        gens = getSolutions(solver, vrs)
+        out = []
+        for gen in gens:
+            out.append(np.array([gen[i] for i in range(len(A[0]))]))
+        return minAntichain(out)
 
 
 def getBases(A, b, C, d):
@@ -91,46 +96,54 @@ def getBases(A, b, C, d):
     of (A | -b)x = 0 and (C | -d)x = 0
     """
     if A is None:
-        C_ext = np.append(C, np.array([-d]).transpose(), axis=1)
+        C_ext = C.copy()
+        if np.any(d != 0):
+            C_ext = np.append(C_ext, np.array([-d]).transpose(), axis=1)
         m = len(C_ext)
         n = len(C_ext[0])
         generator_bound = int((n * oneInftyNorm(C_ext) + 1) ** m)
-        return hilbertBasis(C_ext, generator_bound)
+        out = hilbertBasis(C_ext, generator_bound)
+        out.append(np.zeros((n,), dtype=int))
+        return minAntichain(out)
+    else:
+        A_ext = A.copy()
+        if np.any(b != 0):
+            A_ext = np.append(A_ext, np.array([-b]).transpose(), axis=1)
+        if C is not None:
+            C_ext = C.copy()
+            if np.any(d != 0):
+                C_ext = np.append(C_ext, np.array([-d]).transpose(), axis=1)
+            A_ext = np.stack(A_ext, C_ext)
 
-    if np.all(b == 0):
-        return [np.zeros((len(A[0]),), dtype=int)]
+        m = len(A_ext)
+        n = len(A_ext[0])
 
-    A_ext = A.copy()
-    A_ext = np.append(A_ext, np.array([-b]).transpose(), axis=1)
-    print("A extended\n" + str(A_ext))
-    if C is not None:
-        C_ext = C.copy()
-        C_ext = np.append(C_ext, np.array([-d]).transpose(), axis=1)
-        A_ext = np.stack(A_ext, C_ext)
-        print("stacked: " + str(A_ext))
+        # TODO: check bound
+        base_bound = int((n * oneInftyNorm(A_ext) + 1) ** m)
 
-    m = len(A_ext)
-    n = len(A_ext[0])
-
-    # TODO: check bound
-    base_bound = int((n * oneInftyNorm(A_ext) + 1) ** m)
-    print("Extended for bases\n" + str(A_ext))
-
-    # get a z3 solver instance and get the bases
-    solver, vrs = solverFromEquation(A_ext, np.zeros((n,), dtype=int),
-                                     base_bound)
-    out = []
-    no_zero = []
-    # the last variable can only be 1, the other are nonzero
-    for i in range(n - 1):
-        no_zero.append(vrs[i] != 0)
-    solver.add(vrs[n - 1] == 1)
-    solver.add(z3.Or(no_zero))
-    bases = getSolutions(solver, vrs)
-    out = []
-    for base in bases:
-        out.append(np.array([base[i] for i in range(n - 1)]))
-    return out
+        # get a z3 solver instance and get the bases
+        solver, vrs = solverFromEquation(A_ext, np.zeros((n,), dtype=int),
+                                         base_bound)
+        out = []
+        no_zero = []
+        # if we extended the matrix, then:
+        # the last variable can only be 1, the other are nonzero
+        if len(A[0]) != n:
+            for i in range(n - 1):
+                no_zero.append(vrs[i] != 0)
+            solver.add(vrs[n - 1] == 1)
+        else:
+            for i in range(n):
+                no_zero.append(vrs[i] != 0)
+        solver.add(z3.Or(no_zero))
+        bases = getSolutions(solver, vrs)
+        out = []
+        # if we extended the matrix, we drop the last dimension
+        if len(A[0]) != n:
+            for base in bases:
+                out.append(np.array([base[i] for i in range(n - 1)]))
+        out.append(np.zeros((len(A[0]),), dtype=int))
+        return minAntichain(out)
 
 
 def hilbertBasis(A, abs_bound=0, positive=False):
@@ -165,7 +178,6 @@ def getSolutions(solver, vrs):
             else:
                 respect_order.append(v > -abs(solver.model()[v].as_long()))
         solver.add(z3.Or(respect_order))
-
     return minAntichain([toNparray(x) for x in out])
 
 
@@ -180,7 +192,6 @@ def solverFromEquation(A, b, abs_bound=0, positive=False):
     m = len(A)
     n = len(A[0])
     vrs = [z3.Int("x%i" % i) for i in range(n)]
-    print(str(vrs))
     solver = z3.Solver()
     for i in range(m):
         term = sum([A[i][j] * vrs[j] for j in range(n)])
@@ -206,7 +217,6 @@ def toNparray(s):
     vrs = [z3.Int("x%i" % i) for i in range(len(s))]
     for v in vrs:
         out.append(s[v].as_long())
-    print(str(out))
     return np.array(out)
 
 
